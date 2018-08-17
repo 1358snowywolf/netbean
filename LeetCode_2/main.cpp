@@ -179,6 +179,8 @@ public:
                     break;
                 }
             }
+            
+            answer += strs[i];
         }
         
         return answer;
@@ -315,28 +317,124 @@ private:
     TreeNode* result;
 };
 
+class Trie{
+public:
+    bool isLeaf;
+    Trie* character[26];
+    
+    Trie(){
+        this->isLeaf = false;
+        
+        for(int i = 0; i < 26; i++){
+            this->character[i] = NULL;
+        }
+    }
+        
+    void insert(string);
+};
+
+void Trie::insert(string key){
+    Trie* curr = this;
+    
+    for(int i = 0; i < key.length(); i++){
+        if(curr->character[key[i] - 'a'] == NULL){
+            curr->character[key[i] - 'a'] = new Trie();
+        }
+        
+        curr = curr->character[key[i] - 'a'];
+    }
+    
+    curr->isLeaf = true;
+}
+
+class Solution014II{
+public:
+    string longestCommonPrefix(vector<string>& strs){
+        if(strs.size() == 0){
+            return "";
+        }
+        else if(strs.size() == 1){
+            return strs[0];
+        }
+        else{
+            auto same = strs[0];
+            
+            for(int i = 0; i < strs.size(); i++){
+                trie->insert(strs[i]);
+                
+                if(strs[i] == ""){
+                    return "";
+                }
+                
+                if(same != strs[i]){
+                    same = -1;
+                }
+
+                if(i + 1 == strs.size() && same == strs[0]){
+                    return same;
+                }
+            }
+
+            string answer = "";
+            int times = 0;
+            int index = 0;
+
+            while(trie->character != nullptr){
+                for(int i = 0; i < 26; i++){
+                    if(trie->character[i] != NULL){
+                        if(times >= 1){
+                            answer += (char)('a' + index);
+                            return answer;
+                        }
+                        else{
+                            index = i;
+                            times++;
+                        }
+                    }
+                }
+
+                answer += (char)('a' + index);
+                trie = trie->character[index];
+                times = 0;
+            }
+
+            return answer;
+        }
+    }
+    
+private:
+    Trie* trie = new Trie();
+};
+
 int main(int argc, char** argv) {
-    TreeNode* root = new TreeNode(6);
-    TreeNode* left = new TreeNode(2);
-    TreeNode* leftleft = new TreeNode(0);
-    TreeNode* leftright = new TreeNode(4);
-    TreeNode* leftrightleft = new TreeNode(3);
-    TreeNode* leftrightright = new TreeNode(5);
-    TreeNode* right = new TreeNode(8);
-    TreeNode* rightleft = new TreeNode(7);
-    TreeNode* rightright = new TreeNode(9);
+//    TreeNode* root = new TreeNode(6);
+//    TreeNode* left = new TreeNode(2);
+//    TreeNode* leftleft = new TreeNode(0);
+//    TreeNode* leftright = new TreeNode(4);
+//    TreeNode* leftrightleft = new TreeNode(3);
+//    TreeNode* leftrightright = new TreeNode(5);
+//    TreeNode* right = new TreeNode(8);
+//    TreeNode* rightleft = new TreeNode(7);
+//    TreeNode* rightright = new TreeNode(9);
+//    
+//    root->left = left;
+//    root->right = right;
+//    left->left = leftleft;
+//    left->right = leftright;
+//    right->left = rightleft;
+//    right->right = rightright;
+//    leftright->left = leftrightleft;
+//    leftright->right = leftrightright;
+//    
+//    Solution235II* sol = new Solution235II();
+//    auto thing = sol->lowestCommonAncestor(root, leftrightright, leftrightright);
     
-    root->left = left;
-    root->right = right;
-    left->left = leftleft;
-    left->right = leftright;
-    right->left = rightleft;
-    right->right = rightright;
-    leftright->left = leftrightleft;
-    leftright->right = leftrightright;
+    string array[] = {"aa", "a"};                                                     //the extra a.
+    vector<string> vec (array, array + sizeof(array) / sizeof(array[0]));
+    Solution014II* sol = new Solution014II();
+    auto thing = sol->longestCommonPrefix(vec);
     
-    Solution235II* sol = new Solution235II();
-    auto thing = sol->lowestCommonAncestor(root, leftrightright, leftrightright);
+    cout << thing;
     
     return 0;
 }
