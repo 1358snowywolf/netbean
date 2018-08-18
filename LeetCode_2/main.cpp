@@ -322,6 +322,7 @@ public:
     bool isLeaf;
     Trie* character[26];
     
+    // constructor
     Trie(){
         this->isLeaf = false;
         
@@ -341,10 +342,12 @@ void Trie::insert(string key){
             curr->character[key[i] - 'a'] = new Trie();
         }
         
+        if(i + 1 == key.length()){
+            curr->isLeaf = true;
+        }
+        
         curr = curr->character[key[i] - 'a'];
     }
-    
-    curr->isLeaf = true;
 }
 
 class Solution014II{
@@ -358,6 +361,7 @@ public:
         }
         else{
             auto same = strs[0];
+            trie = new Trie();
             
             for(int i = 0; i < strs.size(); i++){
                 trie->insert(strs[i]);
@@ -379,21 +383,25 @@ public:
             int times = 0;
             int index = 0;
 
-            while(trie->character != nullptr){
+            while(trie != nullptr){
                 for(int i = 0; i < 26; i++){
                     if(trie->character[i] != NULL){
                         if(times >= 1){
-                            answer += (char)('a' + index);
+//                            answer += (char)('a' + index);
                             return answer;
                         }
                         else{
                             index = i;
                             times++;
                         }
+                        
                     }
                 }
 
                 answer += (char)('a' + index);
+                if(trie->isLeaf){
+                    return answer;
+                }
                 trie = trie->character[index];
                 times = 0;
             }
@@ -403,7 +411,7 @@ public:
     }
     
 private:
-    Trie* trie = new Trie();
+    Trie* trie; // = new Trie();
 };
 
 int main(int argc, char** argv) {
@@ -429,7 +437,7 @@ int main(int argc, char** argv) {
 //    Solution235II* sol = new Solution235II();
 //    auto thing = sol->lowestCommonAncestor(root, leftrightright, leftrightright);
     
-    string array[] = {"aa", "a"};                                                     //the extra a.
+    string array[] = {"ab", "a"};                                                     //the extra a.
     vector<string> vec (array, array + sizeof(array) / sizeof(array[0]));
     Solution014II* sol = new Solution014II();
     auto thing = sol->longestCommonPrefix(vec);

@@ -1,15 +1,12 @@
+/* Use the slash-star style comments or the system won't see your
+   identification information */
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+ID: isabell13
+TASK: gift1
+LANG: C++                 
+*/
+/* LANG can be C++11 or C++14 for those more recent releases */
 
-/* 
- * File:   gift1.cpp
- * Author: zduan
- *
- * Created on August 15, 2018, 8:07 PM
- */
 
 #include <iostream>
 #include <fstream>
@@ -22,21 +19,22 @@ using namespace std;
 class np {
 public:
    int initial_amount;
-   unordered_map<string, np*> friend_list;
-   int final_amout;
-   np (string n) : name(n), final_amout(0) {}
+   vector<np*> friend_list;
+   int final_amount;
+   np (string n) : name(n), final_amount(0) {}
 private:
    string name;
 };
 
 int main(int argc, const char * argv[]) {
-   ifstream fin ("/home/zduan/gift1.in");
-   ofstream fout ("/home/zduan/gift1.out");
+   ifstream fin ("gift1.in");
+   ofstream fout ("gift1.out");
    
    int count;
    fin >> count;
    
    unordered_map<string, np*> np_map;
+   vector<string> np_name;
    
    // begin to read and add all nps to the set.
    for (int i = 0; i< count; i++) {
@@ -44,9 +42,8 @@ int main(int argc, const char * argv[]) {
        fin >> name;
        np* item = new np(name);
        np_map.insert({name, item});
+       np_name.push_back(name);
    }
-   
-   np* giver = new np();
    
    // read and add the money and friend into each person.
    for (int i = 0; i< count; i++) {
@@ -54,33 +51,54 @@ int main(int argc, const char * argv[]) {
        fin >> name;
        auto person = np_map.find(name);
        if (person != np_map.end()) {
-           giver = np_map[name];
+           np* giver = np_map[name];
            int amount;
            int count_of_friend;
            
            fin >> amount;
            fin >> count_of_friend;
            giver->initial_amount = amount;
-           unordered_map<string, np*> list;
+           vector<np*> list;
            
            for(int j = 0; j< count_of_friend; j++) {
                string friend_name;
                fin >> friend_name;
-               list.insert({friend_name, np_map[friend_name]});
+               list.push_back(np_map[friend_name]);
            }
            
            giver->friend_list = list;
        }
    }
    
-   for(int i = 0; i < giver->friend_list.size(); i++){
-       int moneyGive = giver->friend_list[2]->initial_amount;
-       int leftover = moneyGive % giver->friend_list.size();
-       giver->final_amount = giver->friend_list->final_amount - (moneyGive / giver->friend_list.size());
+   //calculations
+   for(int i = 0; i < np_name.size(); i++){
+       string current_name = np_name[i];
+       int giving = np_map[current_name]->initial_amount;
+       int number_of_recievers = np_map[current_name]->friend_list.size();
+       int leftovers = 0;
+       int amount_giving = 0;
+       
+       if(number_of_recievers == 0){
+           leftovers = giving;
+       }
+       else{
+           leftovers = giving % number_of_recievers;
+           amount_giving = giving / number_of_recievers;
+       }
+       
+       np_map[current_name]->final_amount += leftovers;
+       np_map[current_name]->final_amount -= giving;
+       
+       for(int i = 0; i < number_of_recievers; i++){
+           np_map[current_name]->friend_list[i]->final_amount += amount_giving;
+       }
    }
-   
-   
+
+   // printing
+   for(int i = 0; i < np_name.size(); i++){
+       int end_money = np_map[np_name[i]]->final_amount;
+       fout << np_name[i] << " " << end_money << endl;
+   }
    
    return 0;
 }
-
