@@ -3,6 +3,7 @@
 #include <ctime>
 #include <vector>
 #include <cmath>
+#include <climits>
 #include <algorithm>
 
 using namespace std;
@@ -45,22 +46,6 @@ public:
         }
         
         return p;
-    }
-};
-
-class Exchange{
-public:
-    int moneyExchange(int cents){
-        int leftover = cents % 10;
-        int amount = cents / 10;
-        cents = cents % 10;
-        
-        leftover = cents % 5;
-        amount = amount + (cents / 5);
-        cents = cents % 5;
-        
-        amount = amount + cents;
-        return amount;
     }
 };
 
@@ -124,15 +109,50 @@ public:
     }
 };
 
-int main(int argc, char** argv) {
-    QuickSort* qs = new QuickSort();
-    int arr[] = {8, 5, 0, 2};
-    vector<int> vec (arr, arr + sizeof(arr) / sizeof(int));
-    qs->sort(vec, 0, vec.size() - 1);
-    
-    for(int i = 0; i < vec.size(); i++){
-        cout << vec[i] << endl;
+class CoinExchange{
+public:
+    int coinExchange(int change, vector<int> coins){
+        if(change == 0){
+            return 0;
+        }
+        else{
+            sort(coins.begin(), coins.end());
+            vector<int> answer (change + 1, 0);
+            answer[0] = 0;
+
+            for(int i = 1; i < answer.size(); i++){
+                int current_coins = INT_MAX;
+                int cent_value = 0;
+                for(int d = 0; d < coins.size(); d++){
+                    if(i - coins.at(d) >= 0 && answer[i - d] != -1){  //error
+                        current_coins = min(current_coins, answer[i - d] + 1);
+                        cent_value = coins[d];
+                    }
+                    
+                    if(i - d < 0){
+                        break;
+                    }
+                }
+                if(current_coins == INT_MAX){
+                    answer[i] = -1;
+                }
+                else{
+                    answer[i] = current_coins + answer[i - cent_value];
+                } 
+            }
+            
+            return answer[change - 1];
+        }
     }
+};
+
+int main(int argc, char** argv) {
+    
+    int change = 7;
+    int array[] = {2};
+    vector<int> coins (array, array + sizeof(array) / sizeof(int));
+    CoinExchange* ce = new CoinExchange();
+    auto thing = ce->coinExchange(change, coins);
     
     return 0;
 }
