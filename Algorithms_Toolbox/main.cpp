@@ -109,6 +109,8 @@ public:
     }
 };
 
+// add some stuff.
+
 class CoinExchange{
 public:
 
@@ -192,7 +194,6 @@ public:
                 res = min (res, tmp);
             }
             
- 
         }
         if (res < value[change]) {
              value[change] = res;
@@ -208,16 +209,72 @@ private:
     vector<int> value;
 };
 
+class EditingDistance{
+public:
+    int alignmentGame(string n, string m){
+        int DP[n.size() + 1][m.size() + 1];
+        
+        for(int i = 0; i <= n.size(); i++){
+            DP[i][0] = i;
+        }
+        
+        for(int i = 0; i <= m.size(); i++){
+            DP[0][i] = i;
+        }
+        
+        for(int i = 1; i <= n.size(); i++){
+            for(int j = 1; j <= m.size(); j++){
+                int insertion = DP[i][j - 1] + 1;
+                int deletion = DP[i - 1][j] + 1;
+                int mismatch = DP[i - 1][j - 1] + (n[i] == m[j] ? 0:1);
+                
+                DP[i][j] = min(insertion, min(deletion, mismatch));
+            }
+        }
+        
+        return DP[n.size()][m.size()];
+    }
+};
+
+class KnapSack{
+public:
+    int nonRepeat(int maxWeight, const vector<int> weights, const vector<int> values){
+        if(maxWeight == 0){
+            return 0;
+        }
+        
+        int DP[values.size() + 1][maxWeight + 1];
+        
+        for(int i = 0; i <= maxWeight; i++){   //boundary
+            DP[0][i] = 0;
+        }
+        
+        for(int i = 1; i <= values.size(); i++){
+            for(int j = 0; j <= maxWeight; j++){
+                if(j - weights[i - 1] < 0){
+                    DP[i][j] = 0;
+                }
+                else{
+                    DP[i][j] = max(DP[i - 1][j], DP[i - 1][j - weights[i - 1]] + values[i - 1]);
+                }
+            }
+        }
+        
+        return DP[values.size()][maxWeight];
+    }
+};
+
 int main(int argc, char** argv) {
     
-    int change = 11;
-    int array[] = {9, 6, 5, 1};
-    vector<int> coins (array, array + sizeof(array) / sizeof(int));
-    CoinExchange* ce = new CoinExchange();
-    ce->setValue(change);
-    auto thing = ce->recursiveII(change, coins);
-    cout <<thing <<endl;
-    cout << LONG_MAX << endl;
-    cout << LONG_MAX + 1;
+    int weights[] = {6, 3, 4, 2};
+    int values[] = {30, 14, 16, 9};
+    vector<int> weight (weights, weights + sizeof(weights) / sizeof(int));
+    vector<int> value (values, values + sizeof(values) / sizeof(int));
+    
+    KnapSack* knap = new KnapSack();
+    int thing = knap->nonRepeat(10, weight, value);
+    
+    cout << thing << endl;
+    
     return 0;
 }
